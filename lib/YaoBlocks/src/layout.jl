@@ -316,6 +316,22 @@ function print_annotation(io::IO, x::Scale)
     end
 end
 
+function Yao.print_annotation(io::IO, x::PowBlock)
+    if x.pow == im
+        printstyled(io, "[+im] "; bold = true, color = :yellow)
+    elseif x.pow == -im
+        printstyled(io, "[-im] "; bold = true, color = :yellow)
+    elseif x.pow == 1
+        printstyled(io, "[+] "; bold = true, color = :yellow)
+    elseif x.pow == -1
+        printstyled(io, "[-] "; bold = true, color = :yellow)
+    elseif real(x.pow) == 0
+        printstyled(io, "[pow: ", imag(x.pow), "im] "; bold = true, color = :yellow)
+    else
+        printstyled(io, "[pow: ", x.pow, "] "; bold = true, color = :yellow)
+    end
+end
+
 function print_annotation(io::IO, x::Scale{Val{S}}) where {S}
     print_annotation(io, Scale(S, x))
 end

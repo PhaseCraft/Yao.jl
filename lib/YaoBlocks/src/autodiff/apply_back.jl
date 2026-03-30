@@ -135,6 +135,24 @@ function apply_back!(st, circuit::AbstractAdd, collector; in)
     (in, inδ)
 end
 
+function apply_back!(st, block::PowBlock, collector)
+    blk = block.pow >= 0 ? block.content : adjoint(block.content)
+    n = abs(block.pow)
+    if nparameters(blk) == 0
+        for _ in 1:n
+            st = apply_back!(st, blk, collector)
+        end
+        return st
+    end
+    res = Any[]
+    for _ in 1:n
+        st = apply_back!(st, blk, res)
+    end
+    np = nparameters(blk)
+    prepend!(collector, [sum(res[i:np:end]) for i in 1:np])
+    return st
+end
+
 function apply_back!(st, block::RepeatedBlock{D,C}, collector) where {D,C}
     if nparameters(content(block)) == 0
         return apply!.(st, Ref(block'))
