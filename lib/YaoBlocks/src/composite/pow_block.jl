@@ -1,3 +1,5 @@
+export PowBlock, power
+
 """
     PowBlock{D,GT<:AbstractBlock} <: AbstractContainer{GT,D}
 
