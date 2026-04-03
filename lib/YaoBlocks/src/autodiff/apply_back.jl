@@ -135,21 +135,14 @@ function apply_back!(st, circuit::AbstractAdd, collector; in)
     (in, inδ)
 end
 
-function apply_back!(st, block::PowBlock, collector)
-    blk = block.pow >= 0 ? block.content : adjoint(block.content)
-    n = abs(block.pow)
-    if nparameters(blk) == 0
-        for _ in 1:n
-            st = apply_back!(st, blk, collector)
-        end
-        return st
-    end
+function apply_back!(st, block::PowBlock{D, BT, PT}, collector) where {D, BT<:AbstractBlock, PT<:Integer}
+    blk = block.pow >= 0 ? content(block) : adjoint(content(block))
     res = Any[]
-    for _ in 1:n
+    for _ in 1:abs(block.pow)
         st = apply_back!(st, blk, res)
     end
     np = nparameters(blk)
-    prepend!(collector, [sum(res[i:np:end]) for i in 1:np])
+    prepend!(collector, [sign(block.pow) * sum(res[i:np:end]) for i in 1:np])
     return st
 end
 

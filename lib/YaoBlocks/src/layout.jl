@@ -195,6 +195,7 @@ color(::Type{<:Add}) = :red
 color(::Type{<:PutBlock}) = :cyan
 color(::Type{<:RepeatedBlock}) = :cyan
 color(::Type{<:GeneralMatrixBlock}) = :red
+color(::Type{<:PowBlock}) = :yellow
 
 print_block(io::IO, g::PhaseGate) = print(io, "phase(", g.theta, ")")
 print_block(io::IO, S::ShiftGate) = print(io, "shift(", S.theta, ")")
@@ -211,6 +212,8 @@ print_block(io::IO, c::Add) = printstyled(io, "+"; bold = true, color = color(Ad
 print_block(io::IO, c::TagBlock) = nothing
 print_block(io::IO, c::GeneralMatrixBlock) =
     printstyled(io, c.tag; color = color(GeneralMatrixBlock))
+print_block(io::IO, pb::PowBlock) = 
+    printstyled(io, "pow(", pb.pow, ")"; bold = true, color = color(PowBlock))
 
 function print_block(io::IO, c::Measure{D,K,OT}) where {D,K,OT}
     strs = String[]
@@ -313,22 +316,6 @@ function print_annotation(io::IO, x::Scale)
         printstyled(io, "[scale: ", imag(x.alpha), "im] "; bold = true, color = :yellow)
     else
         printstyled(io, "[scale: ", x.alpha, "] "; bold = true, color = :yellow)
-    end
-end
-
-function Yao.print_annotation(io::IO, x::PowBlock)
-    if x.pow == im
-        printstyled(io, "[+im] "; bold = true, color = :yellow)
-    elseif x.pow == -im
-        printstyled(io, "[-im] "; bold = true, color = :yellow)
-    elseif x.pow == 1
-        printstyled(io, "[+] "; bold = true, color = :yellow)
-    elseif x.pow == -1
-        printstyled(io, "[-] "; bold = true, color = :yellow)
-    elseif real(x.pow) == 0
-        printstyled(io, "[pow: ", imag(x.pow), "im] "; bold = true, color = :yellow)
-    else
-        printstyled(io, "[pow: ", x.pow, "] "; bold = true, color = :yellow)
     end
 end
 
