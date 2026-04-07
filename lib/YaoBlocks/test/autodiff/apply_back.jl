@@ -149,5 +149,7 @@ end
                 reg0, PowBlock(put(3, 1:2=>kron(Rx(0.5), Ry(0.4))), n), [0.5, 0.4], δ = 1e-5
             )
         end
+        # pow=0 has no params and should just return the first argument
+        @test apply_back!((1,1), PowBlock(put(3, 1=>Rx(0.5)), 0), []) == (1, 1)
     end
 end

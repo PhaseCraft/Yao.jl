@@ -136,7 +136,8 @@ function apply_back!(st, circuit::AbstractAdd, collector; in)
 end
 
 function apply_back!(st, block::PowBlock{D, BT, PT}, collector) where {D, BT<:AbstractBlock, PT<:Integer}
-    blk = block.pow >= 0 ? content(block) : adjoint(content(block))
+    iszero(block.pow) && return st
+    blk = block.pow > 0 ? content(block) : adjoint(content(block))
     res = Any[]
     for _ in 1:abs(block.pow)
         st = apply_back!(st, blk, res)

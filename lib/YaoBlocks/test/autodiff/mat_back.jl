@@ -162,4 +162,6 @@ end
             use_outeradj = use_outeradj,
         )
     end
+    # pow=0 has no params and should just return last arg
+    @test mat_back!(Float64,  PowBlock(put(3, 1=>Rx(0.5)), 0), [], [1,2,3]) == [1,2,3]
 end

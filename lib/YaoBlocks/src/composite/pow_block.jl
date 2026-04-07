@@ -3,11 +3,12 @@ export PowBlock, power
 using LinearAlgebra
 
 """
-    PowBlock{D,GT<:AbstractBlock} <: AbstractContainer{GT,D}
+    PowBlock{D,GT<:AbstractBlock,PT<:Real} <: AbstractContainer{GT,D}
+    PowBlock(block, pow) -> PowBlock
 
 Repeat the same block `content` `pow` times
 """
-struct PowBlock{D,BT<:AbstractBlock, PT<:Real} <: AbstractContainer{BT,D}
+struct PowBlock{D,BT<:AbstractBlock,PT<:Real} <: AbstractContainer{BT,D}
     content::BT
     pow::PT
 end
@@ -42,7 +43,7 @@ function YaoAPI.unsafe_apply!(r::AbstractRegister, pb::PowBlock)
 end
 
 function nparameters(pb::PowBlock)
-    return pb.pow != 0 ? nparameters(pb.content) : 0
+    return iszero(pb.pow) ? 0 : nparameters(pb.content)
 end
 Base.adjoint(pb::PowBlock) = PowBlock(adjoint(pb.content), pb.pow)
 Base.:(==)(a::PowBlock, b::PowBlock) = a.pow == b.pow && a.content == b.content
