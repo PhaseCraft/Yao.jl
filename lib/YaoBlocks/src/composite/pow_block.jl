@@ -38,6 +38,7 @@ function YaoAPI.unsafe_apply!(r::AbstractRegister, pb::PowBlock{D, BT, PT}) wher
     return r
 end
 
+# Fall back for non integer powers
 function YaoAPI.unsafe_apply!(r::AbstractRegister, pb::PowBlock)
     YaoAPI.unsafe_apply!(r, matblock(mat(pb)))
 end
@@ -66,4 +67,3 @@ power(Rx(0.5))(3)     # lazy form
 ```
 """
 power(block::AbstractBlock, pow::Real) = PowBlock(block, pow)
-power(block::AbstractBlock) = @λ(pow -> power(block, pow))
