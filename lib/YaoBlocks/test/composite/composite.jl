@@ -21,7 +21,7 @@ end
 end
 
 @testset "test pow" begin
-    include("pow.jl")
+    include("power.jl")
 end
 
 @testset "test repeated" begin

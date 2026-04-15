@@ -64,7 +64,7 @@ include("put_block.jl")
 include("repeated.jl")
 include("subroutine.jl")
 include("add.jl")
-include("pow_block.jl")
+include("power.jl")
 
 # tag blocks
 include("tag/tag.jl")
