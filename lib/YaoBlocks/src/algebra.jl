@@ -37,4 +37,4 @@ Base.sum(blocks::AbstractVector{<:AbstractBlock{D}}) where D = Add(blocks)
 Base.:(-)(lhs::AbstractBlock, rhs::AbstractBlock) = Add(lhs, -rhs)
 
 # pow
-Base.:(^)(x::AbstractBlock, n::Int) = PowBlock(x, n)
+Base.:(^)(x::AbstractBlock, n::Int) = Power(x, n)

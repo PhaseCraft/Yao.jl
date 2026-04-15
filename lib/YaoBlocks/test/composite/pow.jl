@@ -1,18 +1,18 @@
 using Test, YaoBlocks
 using LinearAlgebra
 
-# Multi-qubit circuits to use as PowBlock content
+# Multi-qubit circuits to use as Power content
 circ2 = chain(2, put(1 => Rx(0.3)), put(2 => Rz(0.7)), cnot(2, 1, 2))
 circ3 = chain(3, put(1 => H), kron(3, 1 => Rx(0.2), 2 => Ry(0.4)), put(3 => T))
 
 @testset "power constructor" begin
     pb = power(X, 3)
-    @test pb isa PowBlock
-    @test pb == PowBlock(X, 3)
+    @test pb isa Power
+    @test pb == Power(X, 3)
 
     pb = X ^ 3
-    @test pb isa PowBlock
-    @test pb == PowBlock(X, 3)
+    @test pb isa Power
+    @test pb == Power(X, 3)
 end
 
 @testset "mat correctness" begin

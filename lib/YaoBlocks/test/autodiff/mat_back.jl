@@ -156,12 +156,12 @@ end
     for n in [-3, -1, 1, 2, 3]
         @test test_mat_back(
             ComplexF64,
-            PowBlock(kron(Rx(0.5), Ry(0.5)), n),
+            Power(kron(Rx(0.5), Ry(0.5)), n),
             [0.5, 0.5];
             δ = 1e-5,
             use_outeradj = use_outeradj,
         )
     end
     # pow=0 has no params and should just return last arg
-    @test mat_back!(Float64,  PowBlock(put(3, 1=>Rx(0.5)), 0), [], [1,2,3]) == [1,2,3]
+    @test mat_back!(Float64,  Power(put(3, 1=>Rx(0.5)), 0), [], [1,2,3]) == [1,2,3]
 end

@@ -104,7 +104,7 @@ function mat_back!(::Type{T}, rb::KronBlock, adjy, collector) where {T}
     return collector
 end
 
-function mat_back!(::Type{T}, rb::PowBlock{D, BT, PT}, adjy, collector) where {T, D, BT<:AbstractBlock, PT<:Integer}
+function mat_back!(::Type{T}, rb::Power{D, BT, PT}, adjy, collector) where {T, D, BT<:AbstractBlock, PT<:Integer}
     nparameters(rb) == 0 && return collector
     blk = content(rb)
     adjy = rb.pow > 0 ? adjy : adjy'
