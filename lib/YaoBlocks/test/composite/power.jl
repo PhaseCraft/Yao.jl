@@ -11,6 +11,7 @@ circ3 = chain(3, put(1 => H), kron(3, 1 => Rx(0.2), 2 => Ry(0.4)), put(3 => T))
     @test pb == Power(X, 3)
 
     pb = put(2, 1=>X)^3
+    println(pb)
     pb2 = copy(pb)
     @test pb2 == pb
     pb2 = put(2, 1=>X)^2
