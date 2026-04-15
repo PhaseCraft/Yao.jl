@@ -51,19 +51,3 @@ Base.:(==)(a::Power, b::Power) = a.pow == b.pow && a.content == b.content
 Base.copy(pb::Power) = Power(pb.pow, pb.content)
 cache_key(pb::Power) = (pb.pow, cache_key(pb.content))
 PropertyTrait(::Power) = PreserveAll()
-
-"""
-    power(pow::Int, block::AbstractBlock) -> Power
-    power(block::AbstractBlock) -> pow -> Power
-
-Create a [`Power`](@ref) that applies `block` exactly `n` times.
-The lazy form `power(n)` returns a function that constructs the block when called.
-
-### Examples
-
-```julia
-power(3, X)           # applies X three times
-power(Rx(0.5))(3)     # lazy form
-```
-"""
-power(block::AbstractBlock, pow::Real) = Power(block, pow)
