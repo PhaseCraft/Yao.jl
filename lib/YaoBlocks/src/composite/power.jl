@@ -1,4 +1,4 @@
-export Power, power
+export Power
 
 using LinearAlgebra
 
