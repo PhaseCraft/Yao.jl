@@ -422,7 +422,7 @@ function draw!(c::CircuitGrid, cb::LabelBlock, address, controls)
     CircuitStyles.gate_bgcolor[] = temp
 end
 
-function draw!(c::CircuitGrid, pb::PowBlock, address, controls)
+function draw!(c::CircuitGrid, pb::Power, address, controls)
     length(address) == 0 && return
     addr_range = minimum(address):maximum(address)
     i_start = frontier(c, addr_range...)
