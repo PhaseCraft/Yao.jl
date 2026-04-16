@@ -15,18 +15,35 @@ struct KronBlock{D,M,MT<:NTuple{M,Any}} <: CompositeBlock{D}
     function KronBlock{D,M,MT}(n::Int,
         locs::NTuple{M,UnitRange{Int}},
         blocks::MT,
-    ) where {D,M,MT<:NTuple{M,AbstractBlock{D}}}
-        perm = TupleTools.sortperm(locs, by = first)
-        locs = TupleTools.permute(locs, perm)
-        blocks = TupleTools.permute(blocks, perm)
-        @assert_locs_safe n locs
+        ) where {D,M,MT<:NTuple{M,AbstractBlock{D}}}
 
-        for (each, b) in zip(locs, blocks)
+        locs_vec = collect(locs)
+        blocks_vec = collect(blocks)
+        
+        perm = sortperm(locs_vec, by=first)
+        locs_vec = locs_vec[perm]
+        blocks_vec = blocks_vec[perm]
+        @assert_locs_safe n locs_vec
+
+        for (each, b) in zip(locs_vec, blocks_vec)
             length(each) != nqudits(b) && throw(
                 LocationConflictError("locs $locs is inconsistent with target block $b"),
             )
         end
-        return new{D,M,typeof(blocks)}(n, locs, blocks)
+        blocks = Tuple{[typeof(m) for m in blocks_vec]...}(blocks_vec)
+        return new{D,M,typeof(blocks)}(n, NTuple{M,UnitRange{Int}}(locs_vec), blocks)
+
+        # perm = TupleTools.sortperm(locs, by = first)
+        # locs = TupleTools.permute(locs, perm)
+        # blocks = TupleTools.permute(blocks, perm)
+        # @assert_locs_safe n locs
+
+        # for (each, b) in zip(locs, blocks)
+        #     length(each) != nqudits(b) && throw(
+        #         LocationConflictError("locs $locs is inconsistent with target block $b"),
+        #     )
+        # end
+        # return new{D,M,typeof(blocks)}(n, locs, blocks)
     end
 end
 
