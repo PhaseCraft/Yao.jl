@@ -55,6 +55,16 @@ function eigenbasis(op::ChainBlock)
     end
 end
 
+function eigenbasis(op::Power)
+    b = op.pow >= 0 ? content(op) : adjoint(content(op))
+    E = chain(b.n)
+    blks = chain(b.n)
+    Ei, Vi = eigenbasis(b)
+    push!(E, fill(Ei, abs(op.pow))...)
+    push!(blks, fill(Vi, abs(op.pow))...)
+    return E, blks
+end
+
 function eigenbasis(op::Add)
     # detect commute operators
     if simple_commute_eachother(subblocks(op))
