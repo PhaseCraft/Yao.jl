@@ -13,7 +13,7 @@ struct Subroutine{D,BT<:AbstractBlock,C} <: AbstractContainer{BT,D}
 end
 
 function Subroutine(n::Int, block::BT, locs::NTuple{C,Int}) where {D,C,BT<:AbstractBlock{D}}
-    @assert_locs_safe n locs
+    @assert_locs_safe n collect(locs)
     if !(length(locs) == nqudits(block) && n>= nqudits(block))
         throw(
             LocationConflictError(
