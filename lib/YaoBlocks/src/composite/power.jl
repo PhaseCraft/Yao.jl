@@ -1,6 +1,7 @@
 export Power
 
 using LinearAlgebra
+using LegibleLambdas
 
 """
     Power{D,GT<:AbstractBlock,PT<:Real} <: AbstractContainer{GT,D}
@@ -19,6 +20,7 @@ function Power(content::BT, pow::PT) where {D,BT<:AbstractBlock{D},PT}
     end
     Power{D,BT,PT}(content, pow)
 end
+Power(content::LegibleLambda, pow::PT) where {PT} = @λ(n -> Power(content(n), pow))
 
 nqudits(pb::Power) = nqudits(pb.content)
 chsubblocks(pb::Power, blk::AbstractBlock) = Power(blk, pb.pow)
