@@ -11,7 +11,7 @@ struct PutBlock{D,C,GT<:AbstractBlock} <: AbstractContainer{GT,D}
     locs::NTuple{C,Int}
 
     function PutBlock(n::Int,block::GT, locs::NTuple{C,Int}) where {D,C,GT<:AbstractBlock{D}}
-        @assert_locs_safe n locs
+        @assert_locs_safe n collect(locs)
         @assert nqudits(block) == C "number of locations doesn't match the size of block"
         return new{D,C,GT}(n, block, locs)
     end
