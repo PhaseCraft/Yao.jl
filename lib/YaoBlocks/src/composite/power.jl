@@ -15,7 +15,7 @@ struct Power{D,BT<:AbstractBlock,PT<:Integer} <: AbstractContainer{BT,D}
 end
 
 function Power(content::BT, pow::PT) where {D,BT<:AbstractBlock{D},PT}
-    if pow isa Int && pow < 0 && !isunitary(content)
+    if pow < 0 && !isunitary(content)
         throw(ArgumentError("negative power requires a unitary block"))
     end
     Power{D,BT,PT}(content, pow)
