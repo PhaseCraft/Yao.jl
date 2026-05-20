@@ -1,4 +1,4 @@
-export KronBlock, kron
+export KronBlock, kron, unsafe_kron
 
 const KronLocT = Union{Int,UnitRange{Int}}
 
@@ -44,6 +44,9 @@ struct KronBlock{D,M,MT<:NTuple{M,Any}} <: CompositeBlock{D}
         #     )
         # end
         # return new{D,M,typeof(blocks)}(n, locs, blocks)
+    end
+    global function _unsafe_kron_block(n::Int, locs::NTuple{M,UnitRange{Int}}, blocks::MT) where {D,M,MT<:NTuple{M,AbstractBlock{D}}}
+        new{D,M,MT}(n, locs, blocks)
     end
 end
 
@@ -173,6 +176,24 @@ julia> kron(1=>X, 3=>Y)
 """
 Base.kron(blocks::Pair{<:Any,<:AbstractBlock}...) = @λ(n -> kron(n, blocks...))
 Base.kron(blocks::Base.Generator) = kron(blocks...)
+
+"""
+    unsafe_kron(n, locs_and_blocks::Pair{<:Any, <:AbstractBlock}...) -> KronBlock
+
+Like [`kron`](@ref) but skips all location and size validity checks.
+"""
+function unsafe_kron(total::Int, blocks::Pair{<:Any,<:AbstractBlock}...)
+    locs = map(p -> _render_kronloc(first(p)), blocks)
+    _unsafe_kron_block(total, locs, map(last, blocks))
+end
+
+"""
+    unsafe_kron(locs_and_blocks::Pair...) -> f(n)
+
+Return a lambda that takes the number of total active qubits as input. See also
+[`unsafe_kron`](@ref).
+"""
+unsafe_kron(blocks::Pair{<:Any,<:AbstractBlock}...) = @λ(n -> unsafe_kron(n, blocks...))
 
 occupied_locs(k::KronBlock) = (vcat([[getindex.(Ref(loc), occupied_locs(b))...] for (loc, b) in zip(k.locs, k.blocks)]...)...,)
 subblocks(x::KronBlock) = x.blocks
