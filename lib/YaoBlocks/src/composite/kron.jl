@@ -187,14 +187,6 @@ function unsafe_kron(total::Int, blocks::Pair{<:Any,<:AbstractBlock}...)
     _unsafe_kron_block(total, locs, map(last, blocks))
 end
 
-"""
-    unsafe_kron(locs_and_blocks::Pair...) -> f(n)
-
-Return a lambda that takes the number of total active qubits as input. See also
-[`unsafe_kron`](@ref).
-"""
-unsafe_kron(blocks::Pair{<:Any,<:AbstractBlock}...) = @λ(n -> unsafe_kron(n, blocks...))
-
 occupied_locs(k::KronBlock) = (vcat([[getindex.(Ref(loc), occupied_locs(b))...] for (loc, b) in zip(k.locs, k.blocks)]...)...,)
 subblocks(x::KronBlock) = x.blocks
 chsubblocks(pb::KronBlock, it) = KronBlock(pb.n, pb.locs, (it...,))

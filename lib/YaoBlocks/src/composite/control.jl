@@ -134,15 +134,6 @@ unsafe_control(total::Int, control_location::Int, target::Pair) =
     unsafe_control(total, (control_location,), target)
 
 """
-    unsafe_control(ctrl_locs, target) -> f(n)
-
-Return a lambda that takes the number of total active qubits as input. See also
-[`unsafe_control`](@ref).
-"""
-unsafe_control(ctrl_locs, target::Pair) = @λ(n -> unsafe_control(n, ctrl_locs, target))
-unsafe_control(control_location::Int, target::Pair) = @λ(n -> unsafe_control(n, control_location, target))
-
-"""
     cnot([n, ]ctrl_locs, location)
 
 Return a speical [`ControlBlock`](@ref), aka CNOT gate with number of active qubits
