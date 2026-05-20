@@ -1,4 +1,4 @@
-export ControlBlock, control, cnot, cz
+export ControlBlock, control, unsafe_control, cnot, cz
 
 """
     $(TYPEDSIGNATURES)
@@ -27,6 +27,9 @@ struct ControlBlock{BT<:AbstractBlock,C,M} <: AbstractContainer{BT,2}
         @assert nqudits(block) == M "number of locations doesn't match the size of block"
         @assert block isa AbstractBlock "expect a block, got $(typeof(block))"
         @assert !isnoisy(block) "controlled block can not contain noisy channel"
+        new{BT,C,M}(n, ctrl_locs, ctrl_config, block, locs)
+    end
+    global function _unsafe_control_block(n::Int, ctrl_locs::NTuple{C}, ctrl_config::NTuple{C}, block::BT, locs::NTuple{M}) where {BT<:AbstractBlock,C,M}
         new{BT,C,M}(n, ctrl_locs, ctrl_config, block, locs)
     end
 end
@@ -116,6 +119,28 @@ julia> control(2, 1=>X)
 """
 control(ctrl_locs, target::Pair) = @λ(n -> control(n, ctrl_locs, target))
 control(control_location::Int, target::Pair) = @λ(n -> control(n, control_location, target))
+
+"""
+    unsafe_control(n, ctrl_locs, locations => subblock)
+
+Like [`control`](@ref) but skips all location and block validity checks.
+"""
+function unsafe_control(total::Int, ctrl_locs, target::Pair)
+    locs = (target.first...,)
+    abs_locs, ctrl_config = decode_sign(Tuple(ctrl_locs))
+    _unsafe_control_block(total, abs_locs, ctrl_config, target.second, locs)
+end
+unsafe_control(total::Int, control_location::Int, target::Pair) =
+    unsafe_control(total, (control_location,), target)
+
+"""
+    unsafe_control(ctrl_locs, target) -> f(n)
+
+Return a lambda that takes the number of total active qubits as input. See also
+[`unsafe_control`](@ref).
+"""
+unsafe_control(ctrl_locs, target::Pair) = @λ(n -> unsafe_control(n, ctrl_locs, target))
+unsafe_control(control_location::Int, target::Pair) = @λ(n -> unsafe_control(n, control_location, target))
 
 """
     cnot([n, ]ctrl_locs, location)
