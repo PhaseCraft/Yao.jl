@@ -1,4 +1,4 @@
-export Subroutine, subroutine
+export Subroutine, subroutine, unsafe_subroutine
 
 """
     Subroutine{D, BT <: AbstractBlock, C} <: AbstractContainer{BT, D}
@@ -76,6 +76,16 @@ true
 """
 function subroutine(n::Int, block::AbstractBlock, locs)
     return Subroutine(n, block, Tuple(locs))
+end
+
+"""
+    unsafe_subroutine(n, block, locs)
+
+Like [`subroutine`](@ref) but skips all location and size validity checks.
+"""
+function unsafe_subroutine(n::Int, block::BT, locs) where {D, BT<:AbstractBlock{D}}
+    locs_tuple = NTuple{length(locs),Int}(locs)
+    return Subroutine{D,BT,length(locs_tuple)}(n, block, locs_tuple)
 end
 
 # support lazy qubits
