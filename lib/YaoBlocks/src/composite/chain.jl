@@ -1,4 +1,4 @@
-export ChainBlock, chain
+export ChainBlock, chain, unsafe_chain
 
 """
     ChainBlock{D} <: CompositeBlock{D}
@@ -13,6 +13,9 @@ struct ChainBlock{D} <: CompositeBlock{D}
     function ChainBlock(n::Int, blocks::Vector{<:AbstractBlock{D}}) where {D}
         _check_block_sizes(blocks, n)
         return new{D}(n, blocks)
+    end
+    global function _unsafe_chain_block(n::Int, blocks::Vector{<:AbstractBlock{D}}) where {D}
+        new{D}(n, blocks)
     end
 end
 
@@ -106,6 +109,14 @@ chain
 ```
 """
 chain(n::Int; nlevel=2) = ChainBlock(n::Int, AbstractBlock{nlevel}[])
+
+"""
+    unsafe_chain(n, blocks...) -> ChainBlock
+
+Like [`chain`](@ref) but skips all size validity checks.
+"""
+unsafe_chain(n::Int, blocks::AbstractBlock{D}...) where {D} =
+    _unsafe_chain_block(n, collect(AbstractBlock{D}, blocks))
 
 """
     chain()
