@@ -117,6 +117,8 @@ Like [`chain`](@ref) but skips all size validity checks.
 """
 unsafe_chain(n::Int, blocks::AbstractBlock{D}...) where {D} =
     _unsafe_chain_block(n, collect(AbstractBlock{D}, blocks))
+unsafe_chain(n::Int, blocks::AbstractVector{<:AbstractBlock{D}}) where {D} =
+    _unsafe_chain_block(n, collect(AbstractBlock{D}, blocks))
 
 """
     chain()

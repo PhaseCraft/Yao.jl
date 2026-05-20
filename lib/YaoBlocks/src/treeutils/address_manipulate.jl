@@ -1,4 +1,4 @@
-export map_address, AddressInfo
+export map_address, unsafe_map_address, AddressInfo
 
 struct AddressInfo
     nbits::Int
@@ -119,4 +119,83 @@ end
 
 function map_address(blk::Power, info::AddressInfo)
     Power(map_address(content(blk), info), blk.pow)
+end
+
+"""
+    unsafe_map_address(block::AbstractBlock, info::AddressInfo) -> AbstractBlock
+
+Like [`map_address`](@ref) but uses unsafe constructors that skip validity checks.
+"""
+function unsafe_map_address end
+
+function unsafe_map_address(block::AbstractBlock, info::AddressInfo)
+    throw(NotImplementedError(:unsafe_map_address, typeof(block)))
+end
+
+function unsafe_map_address(blk::Measure{D}, info::AddressInfo) where D
+    m = Measure{D}(info.nbits,
+        blk.rng,
+        blk.operator,
+        (blk.locations / info...,),
+        blk.postprocess,
+        blk.error_prob,
+    )
+    if isdefined(blk, :results)
+        m.results = blk.results
+    end
+    return m
+end
+
+function unsafe_map_address(blk::PrimitiveBlock, info::AddressInfo)
+    if length(info.addresses) == info.nbits
+        return blk
+    else
+        return put(info.nbits, info.addresses => blk)
+    end
+end
+
+unsafe_map_address(blk::PutBlock, info::AddressInfo) =
+    put(info.nbits, blk.locs / info => content(blk))
+
+function unsafe_map_address(blk::ControlBlock, info::AddressInfo)
+    new_ctrl_locs = map((l, c) -> c == 1 ? l : -l, blk.ctrl_locs / info, blk.ctrl_config)
+    unsafe_control(info.nbits, new_ctrl_locs, blk.locs / info => content(blk))
+end
+
+function unsafe_map_address(blk::KronBlock, info::AddressInfo)
+    mapped = blk.locs / info
+    unsafe_kron(info.nbits, (first(l):last(l) => b for (l, b) in zip(mapped, blk.blocks))...)
+end
+
+function unsafe_map_address(blk::RepeatedBlock, info::AddressInfo)
+    repeat(info.nbits, content(blk), blk.locs / info)
+end
+
+function unsafe_map_address(blk::Subroutine, info::AddressInfo)
+    unsafe_subroutine(info.nbits, content(blk), blk.locs / info)
+end
+
+function unsafe_map_address(blk::ChainBlock{D}, info::AddressInfo) where D
+    new_blocks = AbstractBlock{D}[unsafe_map_address(b, info) for b in subblocks(blk)]
+    unsafe_chain(info.nbits, new_blocks)
+end
+
+function unsafe_map_address(blk::Daggered, info::AddressInfo)
+    Daggered(unsafe_map_address(content(blk), info))
+end
+
+function unsafe_map_address(blk::CachedBlock, info::AddressInfo)
+    CachedBlock(blk.server, unsafe_map_address(content(blk), info), blk.level)
+end
+
+function unsafe_map_address(blk::Scale, info::AddressInfo)
+    Scale(blk.alpha, unsafe_map_address(content(blk), info))
+end
+
+function unsafe_map_address(blk::AbstractAdd, info::AddressInfo)
+    chsubblocks(blk, map(b -> unsafe_map_address(b, info), subblocks(blk)))
+end
+
+function unsafe_map_address(blk::Power, info::AddressInfo)
+    Power(unsafe_map_address(content(blk), info), blk.pow)
 end
